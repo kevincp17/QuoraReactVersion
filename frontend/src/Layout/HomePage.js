@@ -1,4 +1,4 @@
-import React,{useEffect, useState} from "react";
+import React,{useEffect, useState,Fragment} from "react";
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -12,6 +12,7 @@ import Fade from '@mui/material/Tooltip';
 import Backdrop from '@mui/material/Backdrop';
 import { styled } from '@mui/material/styles';
 import { grey,blueGrey } from '@mui/material/colors';
+import { Popover,Transition } from '@headlessui/react'
 import { GetAnswerRequest,GetSpaceRequest } from '../ReduxSaga/Action/HomePage'
 import config from "../config/config";
 
@@ -159,7 +160,7 @@ export default function HomePage(){
                     {
                         spaces && spaces.map(spa=>{
                             return(
-                                <button className="flex flex-row items-center transition bg-slate-200 hover:bg-slate-400 w-full py-1 pr-10 space-x-1.5">
+                                <button className="flex flex-row items-center transition bg-slate-200 rounded hover:bg-slate-400 w-full py-1 pr-10 space-x-1.5">
                                     <div className="w-1/6">
                                         {
                                                 spa.space_user.photo
@@ -192,15 +193,15 @@ export default function HomePage(){
 
                 <div className="flex flex-col basis-7/12 space-y-3">
                     <div className="flex flex-col w-full bg-white border border-gray-300 rounded pb-1">
-                        <div className="flex flex-row px-3 pt-2.5">
+                        <div className="flex flex-row px-3 pt-2.5 text-gray-500">
                             <img className="h-9 w-9 rounded-full mt-1" src="https://media-exp1.licdn.com/dms/image/C4E03AQG1ZuvjtoCrpg/profile-displayphoto-shrink_200_200/0/1645879659085?e=1663804800&v=beta&t=nkUnsJLhJ2f8lS73AkNfSC6J4T80OaqtSPCj4b_Ho38"></img>
                             <button className="pr-64 transition ml-2 mt-1 h-9 w-full pb-1 border rounded-full w-28 bg-gray-100 hover:bg-gray-200 font-normal">What do you want to ask or share?</button>
                         </div>
 
-                        <div className="flex flex-row px-3 pt-0.5">
-                            <button className="transition ml-2 mt-1 h-9 w-2/6 pb-1 rounded-full hover:bg-gray-200 font-normal"><FontAwesomeIcon  className="h-4 mx-2" icon={solid('question')}/>Ask</button>
-                            <button className="transition ml-2 mt-1 h-9 w-2/6 pb-1 rounded-full hover:bg-gray-200 font-normal"><FontAwesomeIcon  className="h-4 mx-2" icon={solid('pen-to-square')}/>Answer</button>
-                            <button className="transition ml-2 mt-1 h-9 w-2/6 pb-1 rounded-full hover:bg-gray-200 font-normal"><FontAwesomeIcon  className="h-4 mx-2" icon={solid('pen')}/>Post</button>
+                        <div className="flex flex-row px-3 pt-0.5 text-gray-500 font-medium">
+                            <button className="transition ml-2 mt-1 h-9 w-2/6 pb-1 rounded-full hover:bg-gray-200"><FontAwesomeIcon  className="h-4 mx-2" icon={solid('question')}/>Ask</button>
+                            <button className="transition ml-2 mt-1 h-9 w-2/6 pb-1 rounded-full hover:bg-gray-200"><FontAwesomeIcon  className="h-4 mx-2" icon={solid('pen-to-square')}/>Answer</button>
+                            <button className="transition ml-2 mt-1 h-9 w-2/6 pb-1 rounded-full hover:bg-gray-200"><FontAwesomeIcon  className="h-4 mx-2" icon={solid('pen')}/>Post</button>
                         </div>
                     </div>
 
@@ -232,7 +233,7 @@ export default function HomePage(){
                                         {ans.content}
                                     </div>
 
-                                    <div  className="flex flex-row">
+                                    <div  className="flex flex-row text-gray-500">
                                         <div className="flex flex-row w-5/6 space-x-3 items-center">
                                             <div className="flex items-center">
                                                 <button className="transition ml-2 mt-1 h-9 bg-slate-200 hover:bg-slate-400 border-r rounded-l-full font-normal p-2">
@@ -267,10 +268,75 @@ export default function HomePage(){
                     }
                 </div>
 
-                <div className="basis-3/12">
+                <div className="flex flex-col basis-3/12 -space-y-0.5">
                     <div className="block border border-gray-300 rounded bg-white font-semibold px-3 py-2">
                         Spaces to follow
                     </div>
+                    {
+                        spaces && spaces.map(splow=>{
+                            return(
+                                <Popover className="relative">
+                                    <Popover.Button className="transition flex flex-row border border-gray-300 bg-white hover:bg-gray-100 items-center transition bg-slate-200 hover:bg-slate-400 w-full py-1 pr-10 space-x-1.5 text-sm">
+                                        <div className="flex items-center w-1/6 ">
+                                            {
+                                                    splow.space_user.photo
+                                                    ?
+                                                    <img className='mx-3 -mt-5 h-5 w-5 rounded' crossOrigin="anonymous" src={config.domain+'/file/'+splow.photo}/>
+                                                    :
+                                                    <>
+                                                        No Image
+                                                    </>
+                                            }
+                                        </div>
+                                            
+                                        <div className="flex flex-col w-5/6 pl-2 text-left">
+                                            <div>{splow.name}</div>
+                                            <div className="text-gray-500">{splow.details}</div>
+                                        </div>
+                                    </Popover.Button>
+
+                                    <Transition
+                                    as={Fragment}
+                                    enter="transition ease-out duration-200"
+                                    enterFrom="opacity-0 translate-y-1"
+                                    enterTo="opacity-100 translate-y-0"
+                                    leave="transition ease-in duration-150"
+                                    leaveFrom="opacity-100 translate-y-0"
+                                    leaveTo="opacity-0 translate-y-1"
+                                    >
+                                    <Popover.Panel className="absolute z-10 w-full px-4">
+                                        <div className="flex flex-col bg-white border border-gray-300 rounded-lg shadow-md">
+                                           <div className="flex flex-row border-b border-gray-300 p-3">
+                                                <div className="pt-1">
+                                                    <img className='mx-3 h-6 w-6 rounded' crossOrigin="anonymous" src={config.domain+'/file/'+splow.photo}/>
+                                                </div>
+                                                
+                                                <div className="flex flex-col w-5/6 pl-2 text-left">
+                                                    <div className="text-base font-bold">{splow.name}</div>
+                                                    <div className="text-gray-500 text-sm">{splow.details}</div>
+                                                </div>
+                                           </div>
+
+                                           <div className="flex flex-row w-full p-2 items-center">
+                                                <div className="w-4/6 mr-5">
+                                                    <button className="transition h-7 w-24 rounded-full hover:bg-gray-200 text-gray-500 text-sm font-medium"><FontAwesomeIcon  className="mx-1 text-blue-500 h-4" icon={solid('person-circle-plus')}/>Follow</button>
+                                                </div>
+                                                
+                                                <div className="w-1/6 text-gray-500">
+                                                    <button className="transition h-7 w-7 rounded-full hover:bg-gray-200"><FontAwesomeIcon  className="h-4" icon={solid('share')}/></button>
+                                                </div>
+                                                
+                                                <div className="w-1/6 text-gray-500">
+                                                    <button className="transition h-7 w-7 rounded-full hover:bg-gray-200"><FontAwesomeIcon  className="h-4" icon={solid('ellipsis')}/></button>
+                                                </div>
+                                           </div>
+                                        </div>
+                                    </Popover.Panel>
+                                    </Transition>
+                                </Popover>
+                            )
+                        })
+                    }
                 </div>
             </main>
         </div>
