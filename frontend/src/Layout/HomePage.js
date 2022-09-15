@@ -3,15 +3,13 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { solid, regular, brands } from '@fortawesome/fontawesome-svg-core/import.macro'
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 import Tooltip from '@mui/material/Tooltip';
-import Modal from '@mui/material/Tooltip';
-import Box from '@mui/material/Tooltip';
-import Typography from '@mui/material/Tooltip';
-import Fade from '@mui/material/Tooltip';
-import Backdrop from '@mui/material/Backdrop';
 import { styled } from '@mui/material/styles';
-import { grey,blueGrey } from '@mui/material/colors';
+import { spacing } from '@mui/system';
 import { Popover,Transition } from '@headlessui/react'
 import { GetAnswerRequest,GetSpaceRequest } from '../ReduxSaga/Action/HomePage'
 import config from "../config/config";
@@ -29,7 +27,10 @@ const style = {
   };
 
 export default function HomePage(){
+    let navigate = useNavigate();
     let location = useLocation();
+    let from = location.state?.from?.pathname || "/";
+
     const [selectedHome,setSelectHome]=useState(true)
     const [selectedFollow,setSelectFollow]=useState(false)
     const [selectedAnswer,setSelectAnswer]=useState(false)
@@ -37,12 +38,10 @@ export default function HomePage(){
     const [selectedField,setSelectField]=useState(false)
     const dispatch = useDispatch();
     const {answers,spaces}=useSelector(state=>state.homePageState)
-    console.log(answers);
-    console.log(spaces);
-
-    const [modalQuestion,setModalQuestion]=useState(false)
-    const handleOpen = () => setModalQuestion(true);
-    const handleClose = () => setModalQuestion(false);
+    
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
 
     const [refresh, setRefresh] = useState(false)
@@ -62,11 +61,13 @@ export default function HomePage(){
     
     return(
         <div className="relative bg-slate-200">
+            {console.log(location.pathname)}
             <navbar className="z-50 fixed top-0 left-0 right-0 flex flex-row px-28 pt-2 pb-1 space-x-4 bg-white drop-shadow-md ">
-                <Link to="/" onClick={() => location.pathname.reload()}>
+                <Link to="/">
                     <h1 className="basis-2/12 font-serif text-3xl text-red-700 font-bold">Quora</h1>
                 </Link>
                 <div className="basis-4/12 font-serif font-bold text-slate-500">
+                <Link to="/">
                     <Tooltip title="Home" placement="bottom">
                         {
                             selectedHome
@@ -77,42 +78,50 @@ export default function HomePage(){
                         }
                         
                     </Tooltip>
+                </Link>
+                    <Link to="Following">
+                        <Tooltip title="Following" placement="bottom">
+                            {
+                                selectedFollow
+                                ?
+                                <ColorButton href='#'><FontAwesomeIcon  className="h-6" icon={solid('rectangle-list')}/></ColorButton>
+                                :
+                                <Button sx={{ color: '#929690',borderBottom: '3px' }} onClick={()=>{setSelectHome(false);setSelectFollow(true);setSelectAnswer(false);setSelectNotification(false)}} href='#'><FontAwesomeIcon className="h-6" icon={solid('rectangle-list')}/></Button>
+                            }
+                            
+                        </Tooltip>
+                    </Link>
 
-                    <Tooltip title="Following" placement="bottom">
-                        {
-                            selectedFollow
-                            ?
-                            <ColorButton href='#'><FontAwesomeIcon  className="h-6" icon={solid('rectangle-list')}/></ColorButton>
-                            :
-                            <Button sx={{ color: '#929690',borderBottom: '3px' }} onClick={()=>{setSelectHome(false);setSelectFollow(true);setSelectAnswer(false);setSelectNotification(false)}} href='#'><FontAwesomeIcon className="h-6" icon={solid('rectangle-list')}/></Button>
-                        }
-                        
-                    </Tooltip>
-
-                    <Tooltip title="Answer" placement="bottom">
-                        {
-                            selectedAnswer
-                            ?
-                            <ColorButton href='#'><FontAwesomeIcon  className="h-6" icon={solid('pen-to-square')}/></ColorButton>
-                            :
-                            <Button sx={{ color: '#929690',borderBottom: '3px' }} onClick={()=>{setSelectHome(false);setSelectFollow(false);setSelectAnswer(true);setSelectNotification(false)}} href='#'><FontAwesomeIcon className="h-6" icon={solid('pen-to-square')}/></Button>
-                        }
-                        
-                    </Tooltip>
+                    <Link to="Answer">
+                        <Tooltip title="Answer" placement="bottom">
+                            {
+                                selectedAnswer
+                                ?
+                                <ColorButton href='#'><FontAwesomeIcon  className="h-6" icon={solid('pen-to-square')}/></ColorButton>
+                                :
+                                <Button sx={{ color: '#929690',borderBottom: '3px' }} onClick={()=>{setSelectHome(false);setSelectFollow(false);setSelectAnswer(true);setSelectNotification(false)}} href='#'><FontAwesomeIcon className="h-6" icon={solid('pen-to-square')}/></Button>
+                            }
+                            
+                        </Tooltip>
+                    </Link>
+                    
 
                     <Tooltip title="Spaces" placement="bottom">    
                         <Button sx={{ color: '#929690',borderBottom: '3px' }}  href='#'><FontAwesomeIcon className="h-6" icon={solid('people-group')}/></Button>
                     </Tooltip>
-
-                    <Tooltip title="Notifications" placement="bottom">
-                        {
-                            selectedNotification
-                            ?
-                            <ColorButton href='#'><FontAwesomeIcon  className="h-6" icon={solid('bell')}/></ColorButton>
-                            :
-                            <Button sx={{ color: '#929690',borderBottom: '3px' }} onClick={()=>{setSelectHome(false);setSelectFollow(false);setSelectAnswer(false);setSelectNotification(true)}} href='#'><FontAwesomeIcon className="h-6" icon={solid('bell')}/></Button>
-                        }
-                    </Tooltip>
+                        
+                    <Link to="Notification">
+                        <Tooltip title="Notifications" placement="bottom">
+                            {
+                                selectedNotification
+                                ?
+                                <ColorButton href='#'><FontAwesomeIcon  className="h-6" icon={solid('bell')}/></ColorButton>
+                                :
+                                <Button sx={{ color: '#929690',borderBottom: '3px' }} onClick={()=>{setSelectHome(false);setSelectFollow(false);setSelectAnswer(false);setSelectNotification(true)}} href='#'><FontAwesomeIcon className="h-6" icon={solid('bell')}/></Button>
+                            }
+                        </Tooltip>
+                    </Link>
+                    
                 </div>
 
                 <div className="basis-6/12">
@@ -137,7 +146,7 @@ export default function HomePage(){
                             <button className="transition ml-2 mt-1 h-7 pb-1 border rounded-full w-28 bg-gray-100 hover:bg-gray-200 font-semibold">Try Quora+</button>
 
                             <div className="w-12 h-9 transition hover:bg-slate-100 hover:opacity-75">
-                                <button className="pt-1.5 px-2" onClick={()=>setModalQuestion(true)}><img className="h-6 w-6 rounded-full" src="https://media-exp1.licdn.com/dms/image/C4E03AQG1ZuvjtoCrpg/profile-displayphoto-shrink_200_200/0/1645879659085?e=1663804800&v=beta&t=nkUnsJLhJ2f8lS73AkNfSC6J4T80OaqtSPCj4b_Ho38"></img></button>
+                                <button className="pt-1.5 px-2"><img className="h-6 w-6 rounded-full" src="https://media-exp1.licdn.com/dms/image/C4E03AQG1ZuvjtoCrpg/profile-displayphoto-shrink_200_200/0/1645879659085?e=1663804800&v=beta&t=nkUnsJLhJ2f8lS73AkNfSC6J4T80OaqtSPCj4b_Ho38"></img></button>
                             </div>
 
                             <div className="w-10 h-9 transition text-gray-500 hover:text-gray-600 hover:bg-slate-100 hover:opacity-75">
@@ -148,14 +157,32 @@ export default function HomePage(){
                 </div>
 
                 <div className="flex flex-row basis-2/12 mt-1.5 text-sm font-semibold">
-                    <button className="transition h-7 text-white border-r border-rose-800 bg-red-700 hover:bg-red-800 rounded-l-full px-2" onClick={()=>setModalQuestion(true)}>Add Question</button>
-                    
+                    {/* <button className="transition h-7 text-white border-r border-rose-800 bg-red-700 hover:bg-red-800 rounded-l-full px-2">Add Question</button> */}
+                    <Button sx={{ height: 11,color: '#ffffff',borderRight: 0,borderColor: '#9f1239',borderRadius: '16px 0px 0px 16px',bgcolor:'#b91c1c','&:hover':{bgcolor:'#991b1b'},p: [0,2,0,2],m:[0,0,4,0],textTransform: "none" }} onClick={handleOpen}>Add Question</Button>
+                    <Modal
+                        open={open}
+                        onClose={handleClose}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                    >
+                        <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Text in a modal
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+                        </Typography>
+                        </Box>
+                    </Modal>
                     <button className="transition h-7 text-white border-l border-rose-800 bg-red-700 hover:bg-red-800 rounded-r-full px-2"><FontAwesomeIcon  className="h-4" icon={solid('chevron-down')}/></button>
                 </div>
 
             </navbar>
-            <main className="z-0 flex flex-row space-x-10 pt-20 px-32 pb-5" onClick={()=>setSelectField(false)}>
-                <div className="basis-2/12 overflow-auto flex flex-col justify-start border-t border-slate-400 text-sm text-slate-800 space-y-1">
+            <main className="z-0" onClick={()=>setSelectField(false)}>
+                {location.pathname==="/"
+                ?
+                <div className="flex flex-row space-x-10 pt-20 px-32 pb-5">
+                    <div className="basis-2/12 overflow-auto flex flex-col justify-start border-t border-slate-400 text-sm text-slate-800 space-y-1">
                     <button className="transition bg-slate-300 hover:bg-slate-400 border border-slate-300 rounded w-full py-1 pr-12"><FontAwesomeIcon  className="bg-slate-400 border border-slate-400 rounded h-3.5 mx-2" icon={solid('plus')}/>Create Space</button>
                     {
                         spaces && spaces.map(spa=>{
@@ -338,6 +365,9 @@ export default function HomePage(){
                         })
                     }
                 </div>
+                </div>
+                :
+                <Outlet />}
             </main>
         </div>
     )
