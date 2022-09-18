@@ -36,6 +36,8 @@ export default function HomePage(){
     const [selectedAnswer,setSelectAnswer]=useState(false)
     const [selectedNotification,setSelectNotification]=useState(false)
     const [selectedField,setSelectField]=useState(false)
+    const [selectedAddQuestion,setAddQuestion]=useState(true)
+    const [selectedCreatePost,setCreatePost]=useState(false)
     const dispatch = useDispatch();
     const {answers,spaces}=useSelector(state=>state.homePageState)
     
@@ -63,11 +65,11 @@ export default function HomePage(){
         <div className="relative bg-slate-200">
             {console.log(location.pathname)}
             <navbar className="z-50 fixed top-0 left-0 right-0 flex flex-row px-28 pt-2 pb-1 space-x-4 bg-white drop-shadow-md ">
-                <Link to="/">
+                <Link to="/Home">
                     <h1 className="basis-2/12 font-serif text-3xl text-red-700 font-bold">Quora</h1>
                 </Link>
                 <div className="basis-4/12 font-serif font-bold text-slate-500">
-                <Link to="/">
+                <Link to="/Home">
                     <Tooltip title="Home" placement="bottom">
                         {
                             selectedHome
@@ -121,19 +123,25 @@ export default function HomePage(){
                             }
                         </Tooltip>
                     </Link>
-                    
                 </div>
 
                 <div className="basis-6/12">
                     {
                         selectedField
                         ?
-                        <div className="grid grid-cols-12 gap-4 mt-0.5">
-                            <input
-                            type='text'
-                            className='col-span-12 h-9 transition border border-sky-500 rounded '
-                            placeholder="Search Quora"/>
-                        </div>
+                        <Modal
+                        open={selectedField}
+                        onClick={()=>setSelectField(false)}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                        >
+                            <div className="w-full mt-2.5 pl-96 pr-32">
+                                <input
+                                type='text'
+                                className='ml-48 h-9 w-7/12 transition border border-sky-500 rounded '
+                                placeholder="Search Quora"/>
+                            </div>
+                        </Modal>
                         :
                         <div className="flex flex-row mt-0.5 space-x-1">
                             <input
@@ -157,29 +165,115 @@ export default function HomePage(){
                 </div>
 
                 <div className="flex flex-row basis-2/12 mt-1.5 text-sm font-semibold">
-                    {/* <button className="transition h-7 text-white border-r border-rose-800 bg-red-700 hover:bg-red-800 rounded-l-full px-2">Add Question</button> */}
-                    <Button sx={{ height: 11,color: '#ffffff',borderRight: 0,borderColor: '#9f1239',borderRadius: '16px 0px 0px 16px',bgcolor:'#b91c1c','&:hover':{bgcolor:'#991b1b'},p: [0,2,0,2],m:[0,0,4,0],textTransform: "none" }} onClick={handleOpen}>Add Question</Button>
+                    <button className="transition h-7 text-white border-r border-rose-800 bg-red-700 hover:bg-red-800 rounded-l-full px-2" onClick={handleOpen}>Add Question</button>
                     <Modal
                         open={open}
                         onClose={handleClose}
                         aria-labelledby="modal-modal-title"
                         aria-describedby="modal-modal-description"
                     >
-                        <Box sx={style}>
-                        <Typography id="modal-modal-title" variant="h6" component="h2">
-                            Text in a modal
-                        </Typography>
-                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                        </Typography>
-                        </Box>
+                        {/* <Box sx={{borderRadius:'16px 16px 16px 16px',borderColor: '#9f1239',position:'absolute',transform: 'translate(-50%, -50%)',top:'50%',left:'50%',bgcolor:'#ffffff',width:700,height:400}}> */}
+                            <div className="absolute top-32 left-80 w-3/6 flex flex-col border border-gray-300 rounded-lg bg-white ">
+                                <div className="flex flex-row h-12 font-medium">
+                                    <div className="basis-1/2">
+                                        {
+                                            selectedAddQuestion
+                                            ?
+                                            <button className="w-full h-full rounded-tl-lg border-b-2 border-blue-400">Add Question</button>
+                                            :
+                                            <button className="w-full h-full border-b-2 border-white transition hover:bg-gray-100 rounded-tl-lg" onClick={()=>{setAddQuestion(true);setCreatePost(false)}}>Add Question</button>
+                                        }
+                                    </div>
+
+                                    <div className="basis-1/2">
+                                        {
+                                            selectedCreatePost
+                                            ?
+                                            <button className="w-full h-full rounded-tl-lg border-b-2 border-blue-400">Create Post</button>
+                                            :
+                                            <button className="w-full h-full border-b-2 border-white transition hover:bg-gray-100 rounded-tr-lg" onClick={()=>{setAddQuestion(false);setCreatePost(true)}}>Create Post</button>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div className="h-80 overflow-auto">
+                                    {
+                                        selectedCreatePost
+                                        ?
+                                        <div className="flex flex-col px-3 pt-3 space-y-2">
+                                            <div className="flex flex-row space-x-2 text-gray-600 items-center">
+                                                <button>
+                                                    <img className="h-4 w-4 rounded-full" src="https://media-exp1.licdn.com/dms/image/C4E03AQG1ZuvjtoCrpg/profile-displayphoto-shrink_200_200/0/1645879659085?e=1663804800&v=beta&t=nkUnsJLhJ2f8lS73AkNfSC6J4T80OaqtSPCj4b_Ho38"></img>
+                                                </button>
+
+                                                <FontAwesomeIcon className="h-2 w-2" icon={solid('play')}/>
+
+                                                <button className="transition font-medium rounded-full border border-gray-300 bg-gray-100 hover:bg-gray-300 p-0.5 w-32 px-2"><FontAwesomeIcon className="h-4 w-4 mr-1 " icon={solid('globe')}/>Everyone<FontAwesomeIcon className="h-4 w-4 ml-1" icon={solid('chevron-down')}/></button>
+                                            </div>
+                                            
+                                            <input className="w-full mb-2 h-auto text-base" type="text" placeholder='Say something...'></input>
+                                        </div>
+                                        :
+                                        selectedAddQuestion
+                                        ?
+                                        <div className="flex flex-col px-3 pt-3 space-y-2">
+                                            <div className="flex flex-row space-x-2 text-gray-600 items-center">
+                                                <button>
+                                                    <img className="h-4 w-4 rounded-full" src="https://media-exp1.licdn.com/dms/image/C4E03AQG1ZuvjtoCrpg/profile-displayphoto-shrink_200_200/0/1645879659085?e=1663804800&v=beta&t=nkUnsJLhJ2f8lS73AkNfSC6J4T80OaqtSPCj4b_Ho38"></img>
+                                                </button>
+
+                                                <FontAwesomeIcon className="h-2 w-2" icon={solid('play')}/>
+
+                                                <button className="transition font-medium rounded-full border border-gray-300 bg-gray-100 hover:bg-gray-300 p-0.5 w-28 px-2"><FontAwesomeIcon className="h-4 w-4 mr-1 " icon={solid('user-group')}/>Public<FontAwesomeIcon className="h-4 w-4 ml-1" icon={solid('chevron-down')}/></button>
+                                            </div>
+
+                                            <div className="transition border-b border-gray-300 hover:border-sky-500">
+                                                <input className="w-full mb-2 h-10 text-xl" type="text" placeholder='Start your question with What,How,Why,etc'></input>
+                                            </div>
+                                        </div>
+                                        :
+                                        null
+                                    }
+                                </div>
+
+                                <div className="h-12 border-t border-gray-300">
+                                    {
+                                        selectedCreatePost
+                                        ?
+                                        <div className="flex flex-row pt-2 px-3">
+                                            <div className="basis-1/2 flex justify-start text-gray-500 space-x-4">
+                                                <button className="transition rounded border border-white hover:border-blue-300 p-0.5"><FontAwesomeIcon className="h-5 w-7" icon={solid('font')}/></button>
+                                                <button className="transition rounded border border-white hover:border-blue-300 p-0.5"><FontAwesomeIcon className="h-5 w-7" icon={solid('image')}/></button>
+                                            </div>
+                                            <div className="basis-1/2 flex justify-end font-medium text-white">
+                                                <button className="transition rounded-full bg-blue-500 hover:bg-blue-600 p-0.5 w-16">Post</button>
+                                            </div>
+                                        </div>
+                                        :
+                                        selectedAddQuestion
+                                        ?
+                                        <div className="flex flex-row justify-end space-x-2 px-3">
+                                            <div>
+                                                <button className="transition rounded-full hover:bg-gray-100 mt-1.5 p-0.5 h-9 w-16 font-medium text-gray-500" onClick={handleClose}>Cancel</button>
+                                            </div>
+
+                                            <div>
+                                                <button className="transition rounded-full bg-blue-500 hover:bg-blue-600 mt-1.5 p-0.5 h-9 w-32 font-medium text-white">Add Question</button>
+                                            </div>
+                                        </div>
+                                        :
+                                        null
+                                    }
+                                </div>
+                            </div>
+                        {/* </Box> */}
                     </Modal>
                     <button className="transition h-7 text-white border-l border-rose-800 bg-red-700 hover:bg-red-800 rounded-r-full px-2"><FontAwesomeIcon  className="h-4" icon={solid('chevron-down')}/></button>
                 </div>
 
             </navbar>
             <main className="z-0" onClick={()=>setSelectField(false)}>
-                {location.pathname==="/"
+                {location.pathname==="/Home"
                 ?
                 <div className="flex flex-row space-x-10 pt-20 px-32 pb-5">
                     <div className="basis-2/12 overflow-auto flex flex-col justify-start border-t border-slate-400 text-sm text-slate-800 space-y-1">
@@ -222,7 +316,7 @@ export default function HomePage(){
                     <div className="flex flex-col w-full bg-white border border-gray-300 rounded pb-1">
                         <div className="flex flex-row px-3 pt-2.5 text-gray-500">
                             <img className="h-9 w-9 rounded-full mt-1" src="https://media-exp1.licdn.com/dms/image/C4E03AQG1ZuvjtoCrpg/profile-displayphoto-shrink_200_200/0/1645879659085?e=1663804800&v=beta&t=nkUnsJLhJ2f8lS73AkNfSC6J4T80OaqtSPCj4b_Ho38"></img>
-                            <button className="pr-64 transition ml-2 mt-1 h-9 w-full pb-1 border rounded-full w-28 bg-gray-100 hover:bg-gray-200 font-normal">What do you want to ask or share?</button>
+                            <button className="pr-64 transition ml-2 mt-1 h-9 w-full pb-1 border rounded-full w-28 bg-gray-100 hover:bg-gray-200 font-normal" onClick={handleOpen}>What do you want to ask or share?</button>
                         </div>
 
                         <div className="flex flex-row px-3 pt-0.5 text-gray-500 font-medium">

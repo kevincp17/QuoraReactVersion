@@ -53,7 +53,10 @@ export default function LoginPage(){
                   </div>
 
                   <div className='grid justify-items-end basis-1/2 text-white font-bold'>
+                    <Link to="/Home">
                         <button className='h-10 w-24 bg-blue-400 rounded-full p-2'>Login</button>
+                    </Link>
+                        
                   </div> 
                 </div>
             </div>

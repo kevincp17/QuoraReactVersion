@@ -11,16 +11,18 @@ export default function Routes() {
     return useRoutes([
       {
         path: '/',
+        element: <LoginPage/>
+      },
+      { 
+        path: '/Home', 
         element: <HomePage/>,
         children:[
-          {path:'Home', element:<HomePage/>},
           {path:'Following', element:<FollowPage/>},
           {path:'Answer', element:<AnswerPage/>},
           {path:'Space', element:<SpacePage/>},
           {path:'Notification', element:<NotificationPage/>}
         ]
       },
-      { path: 'Login', element: <LoginPage/> },
       { path: '*', element: <Navigate to="/404" replace /> }
     ]);
   }
