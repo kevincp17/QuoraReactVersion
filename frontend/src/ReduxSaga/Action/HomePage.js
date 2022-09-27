@@ -14,6 +14,21 @@ export const GetAnswerFailed = (payload) => ({
     payload
 })
 
+export const GetOneUserRequest = (payload) => ({
+    type : ActionType.GETONE_USER_REQUEST,
+    payload
+})
+
+export const GetOneUserSuccess = (payload) => ({
+    type : ActionType.GETONE_USER_SUCCESS,
+    payload
+})
+
+export const GetOneUserFailed = (payload) => ({
+    type : ActionType.GETONE_USER_FAILED,
+    payload
+})
+
 export const AddAnswerRequest = (payload) => ({
     type:ActionType.ADD_ANSWER_REQUEST,
     payload
@@ -86,6 +101,21 @@ export const GetOneSpaceSuccess = (payload) => ({
 
 export const GetOneSpaceFailed = (payload) => ({
     type : ActionType.GETONE_SPACE_FAILED,
+    payload
+})
+
+export const LogoutRequest = (payload) => ({
+    type : ActionType.LOGOUT_REQUEST,
+    payload
+})
+
+export const LogoutSuccess = (payload) => ({
+    type : ActionType.LOGOUT_SUCCESS,
+    payload
+})
+
+export const LogoutFailed = (payload) => ({
+    type : ActionType.LOGOUT_FAILED,
     payload
 })
 

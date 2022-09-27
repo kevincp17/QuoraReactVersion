@@ -10,11 +10,11 @@ import LoginPage from './Layout/LoginPage'
 export default function Routes() {
     return useRoutes([
       {
-        path: '/',
-        element: <LoginPage/>
+        path: '/login',
+        element: <LoginPage/>,
       },
       { 
-        path: '/Home', 
+        path: '/', 
         element: <HomePage/>,
         children:[
           {path:'Following', element:<FollowPage/>},

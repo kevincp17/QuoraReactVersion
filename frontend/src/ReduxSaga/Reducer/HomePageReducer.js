@@ -5,7 +5,11 @@ const INIT_STATE = {
     answer:[],
 
     spaces: [],
-    space:[]
+    space:[],
+
+    users:[],
+    user:[]
+
 }
 
 const HomePageReduce = (state = INIT_STATE, action) => {
@@ -35,6 +39,14 @@ const HomePageReduce = (state = INIT_STATE, action) => {
                 return { ...state }
             case ActionType.GETONE_SPACE_SUCCESS:
                 return GetOneSpaceSuccess(state, action)
+            case ActionType.GETONE_USER_REQUEST:
+                return { ...state }
+            case ActionType.GETONE_USER_SUCCESS:
+                return GetOneUserSuccess(state, action)
+            case ActionType.LOGOUT_REQUEST:
+                return { ...state }
+            case ActionType.LOGOUT_SUCCESS:
+                return LogoutSucceed(state, action)
         default:
             return state
     }
@@ -82,6 +94,22 @@ const AddSpaceSucceed = (state,action) =>{
     return {
         ...state,
         spaces : [...state.spaces,payload]
+    }
+}
+
+const GetOneUserSuccess = (state, action) => {
+    return {
+        ...state,
+        user: action.payload
+    }
+}
+
+const LogoutSucceed = (state, action) => {
+    const { payload } = action
+    const filterUser = state.users.filter(el => el.user_id !== payload)
+    return {
+        ...state,
+        users: [...filterUser]
     }
 }
 

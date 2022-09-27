@@ -1,5 +1,5 @@
 import React,{useEffect, useState,Fragment} from "react";
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation,useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { solid, regular, brands } from '@fortawesome/fontawesome-svg-core/import.macro'
@@ -11,7 +11,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import { spacing } from '@mui/system';
 import { Popover,Transition } from '@headlessui/react'
-import { GetAnswerRequest,GetSpaceRequest } from '../ReduxSaga/Action/HomePage'
+import { GetAnswerRequest,GetSpaceRequest,GetOneUserRequest,LogoutRequest } from '../ReduxSaga/Action/HomePage'
 import config from "../config/config";
 
 const style = {
@@ -26,10 +26,11 @@ const style = {
     p: 4,
   };
 
-export default function HomePage(){
+export default function HomePage(props){
     let navigate = useNavigate();
     let location = useLocation();
     let from = location.state?.from?.pathname || "/";
+    const [searchParams]=useSearchParams()
 
     const [selectedHome,setSelectHome]=useState(true)
     const [selectedFollow,setSelectFollow]=useState(false)
@@ -39,7 +40,7 @@ export default function HomePage(){
     const [selectedAddQuestion,setAddQuestion]=useState(true)
     const [selectedCreatePost,setCreatePost]=useState(false)
     const dispatch = useDispatch();
-    const {answers,spaces}=useSelector(state=>state.homePageState)
+    const {answers,spaces,user}=useSelector(state=>state.homePageState)
     
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
@@ -47,13 +48,19 @@ export default function HomePage(){
 
 
     const [refresh, setRefresh] = useState(false)
-    console.log(selectedHome);
+    // console.log(location.state.email);
 
     useEffect(() => {
         dispatch(GetAnswerRequest())
         dispatch(GetSpaceRequest())
+        dispatch(GetOneUserRequest(location.state.email))
         setRefresh(false)
     }, [refresh])
+
+    const Logout = async () =>{
+        dispatch(LogoutRequest())
+        navigate('/login');
+    }
  
     const ColorButton = styled(Button)(({ theme }) => ({
         color: '#9f1239',
@@ -63,13 +70,13 @@ export default function HomePage(){
     
     return(
         <div className="relative bg-slate-200">
-            {console.log(location.pathname)}
             <navbar className="z-50 fixed top-0 left-0 right-0 flex flex-row px-28 pt-2 pb-1 space-x-4 bg-white drop-shadow-md ">
-                <Link to="/Home">
+                <Link to="/">
                     <h1 className="basis-2/12 font-serif text-3xl text-red-700 font-bold">Quora</h1>
+                    
                 </Link>
                 <div className="basis-4/12 font-serif font-bold text-slate-500">
-                <Link to="/Home">
+                <Link to="/">
                     <Tooltip title="Home" placement="bottom">
                         {
                             selectedHome
@@ -131,7 +138,7 @@ export default function HomePage(){
                         ?
                         <Modal
                         open={selectedField}
-                        onClick={()=>setSelectField(false)}
+                        onClose={()=>setSelectField(false)}
                         aria-labelledby="modal-modal-title"
                         aria-describedby="modal-modal-description"
                         >
@@ -153,8 +160,68 @@ export default function HomePage(){
 
                             <button className="transition ml-2 mt-1 h-7 pb-1 border rounded-full w-28 bg-gray-100 hover:bg-gray-200 font-semibold">Try Quora+</button>
 
-                            <div className="w-12 h-9 transition hover:bg-slate-100 hover:opacity-75">
-                                <button className="pt-1.5 px-2"><img className="h-6 w-6 rounded-full" src="https://media-exp1.licdn.com/dms/image/C4E03AQG1ZuvjtoCrpg/profile-displayphoto-shrink_200_200/0/1645879659085?e=1663804800&v=beta&t=nkUnsJLhJ2f8lS73AkNfSC6J4T80OaqtSPCj4b_Ho38"></img></button>
+                            <div className="w-12 h-9">
+                                <Popover>
+                                    <Popover.Button className="py-1.5 px-2 transition hover:bg-slate-100 hover:opacity-75">
+                                        <img className="h-6 w-6 rounded-full" crossOrigin="anonymous" src={config.domain+'/file/'+user.photo}></img>
+                                    </Popover.Button>
+
+                                    <Transition
+                                    as={Fragment}
+                                    enter="transition ease-out duration-200"
+                                    enterFrom="opacity-0 translate-y-1"
+                                    enterTo="opacity-100 translate-y-0"
+                                    leave="transition ease-in duration-150"
+                                    leaveFrom="opacity-100 translate-y-0"
+                                    leaveTo="opacity-0 translate-y-1"
+                                    >
+                                    <Popover.Panel className="absolute z-50 w-72 px-4 right-52 mt-4">
+                                        <div className="overflow-auto flex flex-col bg-white border border-gray-300 rounded shadow-md h-96">
+                                          <button className="px-2 py-4 transition hover:opacity-50 border-b border-gray-300">
+                                            <img className="h-10 w-10 rounded-full" crossOrigin="anonymous" src={config.domain+'/file/'+user.photo}></img>
+                                            <div className="flex flex-row items-center">
+                                                <div className="text-lg text-left basis-3/4 font-bold">{user.name}</div>
+                                                <div className="grid justify-items-end basis-1/4 pr-3 text-gray-500">
+                                                    <FontAwesomeIcon className="h-4" icon={solid('chevron-right')}/>
+                                                </div>
+                                            </div>
+                                            <div className="text-sm text-left pr-3">{user.credentials}</div>
+                                          </button>
+
+                                          <div className="flex flex-col text-base py-0.5 transition border-b border-gray-300">
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-2"><FontAwesomeIcon className="h-4 w-4 text-gray-500 mr-2.5" icon={solid('message')}/>Messages</button>
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-2"><FontAwesomeIcon className="h-4 w-4 text-gray-500 mr-2.5" icon={solid('volume-high')}/>Create Ad</button>
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-2"><FontAwesomeIcon className="h-4 w-4 text-gray-500 mr-2.5" icon={solid('dollar-sign')}/>Monetization</button>
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-2"><FontAwesomeIcon className="h-4 w-4 text-gray-500 mr-2.5" icon={solid('signal')}/>Your content and stat</button>
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-2"><FontAwesomeIcon className="h-4 w-4 text-gray-500 mr-2.5" icon={solid('bookmark')}/>Bookmarks</button>
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-2"><FontAwesomeIcon className="h-4 w-4 text-gray-500 mr-2.5" icon={solid('pen-to-square')}/>Drafts</button>
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-2"><FontAwesomeIcon className="h-4 w-4 text-gray-500 mr-2.5" icon={solid('star')}/>Try Quora+</button>
+                                          </div>
+
+                                          <div className="flex flex-col text-base py-0.5 transition border-b border-gray-300">
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-1">Dark mode</button>
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-1">Settings</button>
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-1">Languanges</button>
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-1">Help</button>
+                                            <button className="transition hover:bg-slate-100 text-sm text-left px-3 py-1" onClick={() => Logout()}>Logout</button>
+                                          </div>
+
+                                          <div className="relative text-sm py-2 px-2 bg-slate-100 text-gray-500">
+                                            <button className="hover:underline hover:underline-offset-1">About</button>-
+                                            <button className="hover:underline hover:underline-offset-1">Careers</button>-
+                                            <button className="hover:underline hover:underline-offset-1">Terms</button>-
+                                            <button className="hover:underline hover:underline-offset-1">Privacy</button>-
+                                            <button className="hover:underline hover:underline-offset-1">Acceptable Use</button>-
+                                            <button className="hover:underline hover:underline-offset-1">Businesess</button>-
+                                            <button className="hover:underline hover:underline-offset-1">Press</button>-
+                                            <button className="hover:underline hover:underline-offset-1">Your Ad Choices</button>
+                                          </div>
+                                          
+                                        </div>
+                                    </Popover.Panel>
+                                    </Transition>
+                                </Popover>
+                                
                             </div>
 
                             <div className="w-10 h-9 transition text-gray-500 hover:text-gray-600 hover:bg-slate-100 hover:opacity-75">
@@ -203,7 +270,7 @@ export default function HomePage(){
                                         <div className="flex flex-col px-3 pt-3 space-y-2">
                                             <div className="flex flex-row space-x-2 text-gray-600 items-center">
                                                 <button>
-                                                    <img className="h-4 w-4 rounded-full" src="https://media-exp1.licdn.com/dms/image/C4E03AQG1ZuvjtoCrpg/profile-displayphoto-shrink_200_200/0/1645879659085?e=1663804800&v=beta&t=nkUnsJLhJ2f8lS73AkNfSC6J4T80OaqtSPCj4b_Ho38"></img>
+                                                    <img className="h-4 w-4 rounded-full" crossOrigin="anonymous" src={config.domain+'/file/'+user.photo}></img>
                                                 </button>
 
                                                 <FontAwesomeIcon className="h-2 w-2" icon={solid('play')}/>
@@ -219,9 +286,10 @@ export default function HomePage(){
                                         <div className="flex flex-col px-3 pt-3 space-y-2">
                                             <div className="flex flex-row space-x-2 text-gray-600 items-center">
                                                 <button>
-                                                    <img className="h-4 w-4 rounded-full" src="https://media-exp1.licdn.com/dms/image/C4E03AQG1ZuvjtoCrpg/profile-displayphoto-shrink_200_200/0/1645879659085?e=1663804800&v=beta&t=nkUnsJLhJ2f8lS73AkNfSC6J4T80OaqtSPCj4b_Ho38"></img>
+                                                    <img className="h-4 w-4 rounded-full" crossOrigin="anonymous" src={config.domain+'/file/'+user.photo}></img>
+        
                                                 </button>
-
+                                                
                                                 <FontAwesomeIcon className="h-2 w-2" icon={solid('play')}/>
 
                                                 <button className="transition font-medium rounded-full border border-gray-300 bg-gray-100 hover:bg-gray-300 p-0.5 w-28 px-2"><FontAwesomeIcon className="h-4 w-4 mr-1 " icon={solid('user-group')}/>Public<FontAwesomeIcon className="h-4 w-4 ml-1" icon={solid('chevron-down')}/></button>
@@ -273,7 +341,7 @@ export default function HomePage(){
 
             </navbar>
             <main className="z-0" onClick={()=>setSelectField(false)}>
-                {location.pathname==="/Home"
+                {location.pathname==="/"
                 ?
                 <div className="flex flex-row space-x-10 pt-20 px-32 pb-5">
                     <div className="basis-2/12 overflow-auto flex flex-col justify-start border-t border-slate-400 text-sm text-slate-800 space-y-1">
@@ -315,8 +383,8 @@ export default function HomePage(){
                 <div className="flex flex-col basis-7/12 space-y-3">
                     <div className="flex flex-col w-full bg-white border border-gray-300 rounded pb-1">
                         <div className="flex flex-row px-3 pt-2.5 text-gray-500">
-                            <img className="h-9 w-9 rounded-full mt-1" src="https://media-exp1.licdn.com/dms/image/C4E03AQG1ZuvjtoCrpg/profile-displayphoto-shrink_200_200/0/1645879659085?e=1663804800&v=beta&t=nkUnsJLhJ2f8lS73AkNfSC6J4T80OaqtSPCj4b_Ho38"></img>
-                            <button className="pr-64 transition ml-2 mt-1 h-9 w-full pb-1 border rounded-full w-28 bg-gray-100 hover:bg-gray-200 font-normal" onClick={handleOpen}>What do you want to ask or share?</button>
+                            <img className="h-9 w-9 rounded-full mt-1" crossOrigin="anonymous" src={config.domain+'/file/'+user.photo}></img>
+                            <button className="pr-64 transition ml-2 mt-1 h-9 w-full pb-1 border rounded-full bg-gray-100 hover:bg-gray-200 font-normal" onClick={handleOpen}>What do you want to ask or share?</button>                
                         </div>
 
                         <div className="flex flex-row px-3 pt-0.5 text-gray-500 font-medium">

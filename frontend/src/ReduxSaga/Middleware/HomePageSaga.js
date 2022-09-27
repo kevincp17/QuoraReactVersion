@@ -1,9 +1,12 @@
 import {call,put} from 'redux-saga/effects'
 import apiAnswer from '../../api/api-answer'
 import apiSpace from '../../api/api-space'
+import apiUser from '../../api/api-user'
+
 import { 
     GetAnswerSuccess,GetAnswerFailed,AddAnswerSuccess,AddAnswerFailed,GetOneAnswerSuccess,GetOneAnswerFailed,
-    GetSpaceSuccess,GetSpaceFailed,AddSpaceSuccess,AddSpaceFailed,GetOneSpaceSuccess,GetOneSpaceFailed 
+    GetSpaceSuccess,GetSpaceFailed,AddSpaceSuccess,AddSpaceFailed,GetOneSpaceSuccess,GetOneSpaceFailed,
+    GetOneUserSuccess,GetOneUserFailed,LogoutSuccess,LogoutFailed
 } from '../Action/HomePage'
 
 
@@ -66,6 +69,26 @@ function* handleGetOneSpace(action){
     }
 }
 
+function* handleGetOneUser(action){
+    const {payload} = action
+    try {
+        const result = yield call(apiUser.findOne,payload)
+        yield put(GetOneUserSuccess(result))
+    } catch (error) {
+        yield put(GetOneUserFailed(error))
+    }
+}
+
+function* handleLogout(action){
+    const {payload} = action
+    try {
+        const result = yield call(apiUser.logout,payload)
+        yield put(LogoutSuccess(result))
+    } catch (error) {
+        yield put(LogoutFailed(error))
+    }
+}
+
 export {
     handleGetAnswer,
     handleAddAnswer,
@@ -73,5 +96,8 @@ export {
 
     handleGetSpace,
     handleAddSpace,
-    handleGetOneSpace
+    handleGetOneSpace,
+
+    handleGetOneUser,
+    handleLogout
 }

@@ -33,6 +33,7 @@ app.use(async(req,res,next)=>{
 app.use('/file',routes.GetImageRoute);
 app.use('/space',routes.SpaceRoute);
 app.use('/answer',routes.AnswerRoute);
+app.use('/user',routes.UserRoute);
 
 const dropDatabaseSync=false;
 
